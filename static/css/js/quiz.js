@@ -58,6 +58,7 @@ function loadQuestion() {
     const quiz = document.getElementById("quiz");
     const question = questions[currentQuestion];
     quiz.innerHTML = `
+        <div class="progress">Pregunta ${currentQuestion + 1} de ${questions.length}</div>
         <div class="question">${question.question}</div>
         <ul class="options">
             ${question.options.map((option, index) => `
@@ -69,6 +70,7 @@ function loadQuestion() {
 
 function checkAnswer(button, isCorrect) {
     const result = document.getElementById("result");
+    const buttons = document.querySelectorAll(".options button");
     if (isCorrect) {
         result.textContent = "¡Correcto!";
         result.style.color = "green";
@@ -77,18 +79,29 @@ function checkAnswer(button, isCorrect) {
         result.textContent = "Incorrecto.";
         result.style.color = "red";
     }
-    const buttons = document.querySelectorAll(".options button");
-    buttons.forEach(btn => btn.disabled = true);
-
+    buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === questions[currentQuestion].correct) {
+            btn.style.backgroundColor = "#388E3C";
+        }
+    });
     setTimeout(() => {
         currentQuestion++;
         if (currentQuestion < questions.length) {
             loadQuestion();
             result.textContent = "";
         } else {
-            result.textContent = `¡Has completado el quiz! Respuestas correctas: ${correctAnswers} de ${questions.length}`;
-        }
+    result.innerHTML = `¡Has completado el quiz! Respuestas correctas: ${correctAnswers} de ${questions.length}
+        <br><button onclick="restartQuiz()" class="back-button" style="margin-top:10px;">Reintentar</button>`;
+}
     }, 2000);
+}
+
+function restartQuiz() {
+    currentQuestion = 0;
+    correctAnswers = 0;
+    loadQuestion();
+    document.getElementById("result").textContent = "";
 }
 
 loadQuestion();
